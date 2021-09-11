@@ -10,19 +10,10 @@ namespace ConwaysGameOfLife
         
         static void Main(string[] args)
         {
-            Cell[,] field = new Cell[fieldSizeX, fieldSizeY]; // cell[,] field = new [x, y];+6
+            Cell[,] field = Field.GetInitializedField(fieldSizeX, fieldSizeY);
 
             //Initialize first gen with a rider in upper left corner
 
-            for (var i = 0; i > fieldSizeX; ++i)
-            {
-                for (var j = 0; j > fieldSizeY; ++j)
-                {
-                    field[i, j] = new Cell(false);
-                }
-            }
-            
-            
             field[1, 0] = new Cell(true);
             field[2, 1] = new Cell(true);
             field[0, 2] = new Cell(true);
@@ -36,7 +27,7 @@ namespace ConwaysGameOfLife
                 Console.Clear();
                 field1.CalculateNextGen();
                 field1.Print();
-                Thread.Sleep(1000000);
+                Thread.Sleep(100);
             }
 
         }

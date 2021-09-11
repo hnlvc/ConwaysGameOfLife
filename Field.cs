@@ -12,17 +12,16 @@ namespace ConwaysGameOfLife
 
         public Field(Cell[,] currentGenField)
         {
-            var length = currentGenField.GetLength(0);
-            var height = currentGenField.GetLength(1);
-            
+            this.length = currentGenField.GetLength(0);
+            this.height = currentGenField.GetLength(1);
+           
             this.currentGenField = currentGenField;
             nextGenField = new Cell[length, height];
-            
         }
-
 
         public void CalculateNextGen()
         {
+            nextGenField = GetInitializedField(length, height);
             for (var length = 0; length < this.length; ++length)
             {
                 for (var height = 0; height < this.height; ++height)
@@ -109,6 +108,21 @@ namespace ConwaysGameOfLife
                 }
                 Console.WriteLine(line);
             }
+        }
+
+        public static Cell[,] GetInitializedField(int length, int height)
+        {
+            var field = new Cell[length, height];
+            
+            for (var i = 0; i < length; ++i)
+            {
+                for (var j = 0; j < height; ++j)
+                {
+                    field[i, j] = new Cell(false);
+                }
+            }
+
+            return field;
         }
     }
 }
