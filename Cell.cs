@@ -1,6 +1,6 @@
 ﻿namespace ConwaysGameOfLife
 {
-    public class Cell
+    public sealed class Cell
     {
         public bool IsAlive { get; set; }
 

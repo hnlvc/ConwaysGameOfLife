@@ -2,86 +2,64 @@
 
 namespace ConwaysGameOfLife
 {
-    class Field
+    internal record Field
     {
-        public Cell[,] CurrentGenField { get => currentGenField; }
-        private Cell[,] currentGenField;
-        private Cell[,] nextGenField;
-        private int length;
-        private int height;
+        public Cell[,] CurrentGenField { get; private set; }
+        private int fieldLength;
+        private int fieldHeight;
 
         public Field(Cell[,] currentGenField)
         {
-            this.length = currentGenField.GetLength(0);
-            this.height = currentGenField.GetLength(1);
-           
-            this.currentGenField = currentGenField;
-            nextGenField = new Cell[length, height];
+            fieldLength = currentGenField.GetLength(0);
+            fieldHeight = currentGenField.GetLength(1);
+
+            CurrentGenField = currentGenField;
         }
 
         public void CalculateNextGen()
         {
-            nextGenField = GetInitializedField(length, height);
-            for (var length = 0; length < this.length; ++length)
+            var nextGenField = GetInitializedField(fieldLength, fieldHeight);
+            for (var positionLength = 0; positionLength < fieldLength; ++positionLength)
             {
-                for (var height = 0; height < this.height; ++height)
+                for (var positionHeight = 0; positionHeight < fieldHeight; ++positionHeight)
                 {
-                    var alive = CountLivingNeighbors(length, height);
-                    if (CurrentGenField[length, height].IsAlive)
+                    var alive = CountLivingNeighbors(positionLength, positionHeight);
+                    
+                    if (CurrentGenField[positionLength, positionHeight].IsAlive)
                     {
-                        if ((alive == 2 || alive == 3))
+                        if (alive == 2 || alive == 3)
                         {
-                            nextGenField[length, height].IsAlive = true;
+                            nextGenField[positionLength, positionHeight].IsAlive = true;
                         }
                     }
 
-                    if (CurrentGenField[length, height].IsAlive == false)
+                    if (CurrentGenField[positionLength, positionHeight].IsAlive == false)
                     {
                         if (alive == 3)
                         {
-                            nextGenField[length, height].IsAlive = true;
+                            nextGenField[positionLength, positionHeight].IsAlive = true;
                         }
                     }
                 }
             }
-            this.currentGenField = nextGenField;
+            this.CurrentGenField = nextGenField;
         }
 
-        public int CountLivingNeighbors(int posLength, int posHeight)
+        public int CountLivingNeighbors(int positionLength, int positionHeight)
         {
             var counter = 0;
+            var neighbors = new (int positionLength, int positionHeight)[8] {
+                (positionLength - 1, positionHeight - 1), (positionLength, positionHeight - 1), (positionLength + 1, positionHeight -1),
+                (positionLength - 1, positionHeight), /*                     me             */ (positionLength + 1, positionHeight),
+                (positionLength - 1, positionHeight + 1), (positionLength, positionHeight + 1), (positionLength + 1, positionHeight + 1)
+            };
 
-            if (IsInField(posLength - 1, posHeight - 1))
+            foreach (var element in neighbors)
             {
-                if (currentGenField[posLength - 1, posHeight - 1].IsAlive) counter++;
-            }
-            if (IsInField(posLength, posHeight - 1))
-            {
-                if (currentGenField[posLength, posHeight - 1].IsAlive) counter++;
-            }
-            if (IsInField(posLength + 1, posHeight - 1))
-            {
-                if (currentGenField[posLength + 1, posHeight - 1].IsAlive) counter++;
-            }
-            if (IsInField(posLength + 1, posHeight))
-            {
-                if (currentGenField[posLength + 1, posHeight].IsAlive) counter++;
-            }
-            if (IsInField(posLength + 1, posHeight + 1))
-            {
-                if (currentGenField[posLength + 1, posHeight + 1].IsAlive) counter++;
-            }
-            if (IsInField(posLength, posHeight + 1))
-            {
-                if (currentGenField[posLength, posHeight + 1].IsAlive) counter++;
-            }
-            if (IsInField(posLength - 1, posHeight + 1))
-            {
-                if (currentGenField[posLength - 1, posHeight + 1].IsAlive) counter++;
-            }
-            if (IsInField(posLength - 1, posHeight))
-            {
-                if (currentGenField[posLength - 1, posHeight].IsAlive) counter++;
+                if(IsInField(element.positionLength, element.positionHeight))
+                {
+                    if (CurrentGenField[element.positionLength, element.positionHeight].IsAlive) counter++;
+                }
             }
 
             return counter;
@@ -89,8 +67,8 @@ namespace ConwaysGameOfLife
 
         public bool IsInField(int length, int height)
         {
-            if (!(length >= 0 && length < this.length)) return false;
-            if (!(height >= 0 && height < this.height)) return false;
+            if (!(length >= 0 && length < fieldLength)) return false;
+            if (!(height >= 0 && height < fieldHeight)) return false;
 
             return true;
         }
@@ -99,12 +77,12 @@ namespace ConwaysGameOfLife
         {
             string line;
 
-            for (var height = 0; height < this.height; ++height)
+            for (var height = 0; height < fieldHeight; ++height)
             {
                 line = "";
-                for (var length = 0; length < this.length; ++length)
+                for (var length = 0; length < fieldLength; ++length)
                 {
-                    line = string.Concat(line, currentGenField[length, height].IsAlive ? '#' : '-');
+                    line = string.Concat(line, CurrentGenField[length, height].IsAlive ? '#' : '-');
                 }
                 Console.WriteLine(line);
             }
@@ -113,7 +91,7 @@ namespace ConwaysGameOfLife
         public static Cell[,] GetInitializedField(int length, int height)
         {
             var field = new Cell[length, height];
-            
+
             for (var i = 0; i < length; ++i)
             {
                 for (var j = 0; j < height; ++j)
